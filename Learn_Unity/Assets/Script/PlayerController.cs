@@ -5,52 +5,74 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+enum targetEnum
+{
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight
+}
+
 public class PlayerController : MonoBehaviour
 {
+    public Transform topLeftTarget;
+    public Transform topRightTarget;
+    public Transform bottomLeftTarget;
+    public Transform bottomRightTarget;
+
     public int Speed = 10;
     public Vector3[] CheckPoints;
 
-    [SerializeField] public float distance;
+    private Transform currentTarget;
+    private targetEnum nextTarget= targetEnum.topLeft;
 
-    public Vector3 moveDirection = Vector3.forward;
-    [SerializeField] public int i = 0;
-
-    private void Awake()
-    {
-
-        CheckPoints = new Vector3[4];
-        CheckPoints[0].Set(16, 0, 48);
-        CheckPoints[1].Set(-104, 0, 48);
-        CheckPoints[2].Set(-104, 0, -60);
-        CheckPoints[3].Set(16, 0, -60);
-    }
     // Start is called before the first frame update
     void Start()
     {
-        
-       
+        currentTarget = topRightTarget;
     }
 
     // Update is called once per frame
     void Update()
     {
-        distance = (transform.position - CheckPoints[i]).magnitude;
+        Vector3 targetPosition= currentTarget.position;
+        Vector3 moveDirection= targetPosition-transform.position;
+        float distance = (moveDirection).magnitude;
 
-        if (i == 0) moveDirection.Set(0, 0, 1);
-        else if (i == 1) moveDirection.Set(-1, 0, 0);
-        else if (i == 2) moveDirection.Set(0, 0, -1);
-        else moveDirection.Set(1, 0, 0);
-
-        if (distance < 0.15)
+        if (distance > 0.1f) {
+            transform.position = Vector3.MoveTowards(transform.position, currentTarget.position, Speed * Time.deltaTime);
+        }
+        else
         {
-            i++;
-            Debug.Log("Đã đến điểm " + i);
-            transform.Rotate(0, -90, 0);
-            if (i > 3) i = 0;
+            setNextTarget(nextTarget);
         }
 
-        Vector3 newPosition = transform.position + moveDirection * Speed * Time.deltaTime;
-        transform.position = newPosition;
+        Vector3 direction = currentTarget.position - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+        transform.rotation = targetRotation;
     }
-    
+    private void setNextTarget(targetEnum target)
+    {
+        switch (target)
+        {
+            case targetEnum.topRight:
+                currentTarget = topRightTarget;
+                nextTarget = targetEnum.topLeft;
+                break;
+            case targetEnum.topLeft:
+                currentTarget = topLeftTarget;
+                nextTarget = targetEnum.bottomLeft;
+                break;
+            case targetEnum.bottomLeft:
+                currentTarget = bottomLeftTarget;
+                nextTarget = targetEnum.bottomRight;
+                break;
+            case targetEnum.bottomRight:
+                currentTarget = bottomRightTarget;
+                nextTarget = targetEnum.topRight;
+                break;
+            
+
+        }
+    }
 }
