@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SetMode();
         if (mode == DriveMode.Manual)
         {
             Manual();
@@ -50,17 +51,17 @@ public class PlayerController : MonoBehaviour
         {
             AutoDrive();
         }
-        SetMode();
+        
     }
 
     private void SetMode()
     {
         
-        if (check)
+        if (Input.GetKey(KeyCode.A))
         {
             mode = DriveMode.Automatic;
         }
-        else
+        if(Input.GetKey(KeyCode.M))
         {
             mode = DriveMode.Manual;
         }
