@@ -17,6 +17,7 @@ enum DriveMode
 {
     Automatic,
     Manual,
+    PhysicalManual
 }
 public class PlayerController : MonoBehaviour
 {
@@ -29,10 +30,20 @@ public class PlayerController : MonoBehaviour
     public float speedRotate = 100f;
     public bool check;
 
+    [SerializeField] private WheelCollider frontLeftWheel;
+    [SerializeField] private WheelCollider frontRightWheel;
+    [SerializeField] private WheelCollider rearLeftWheel;
+    [SerializeField] private WheelCollider rearRightWheel;
+
+    [SerializeField] private float maxSteerAngle = 30f;
+
+    [SerializeField] private float motorForce = 1500f;
+    [SerializeField] private float breakForce = 3000f;
+
     private Transform currentTarget;
     private targetEnum nextTarget= targetEnum.topLeft;
 
-    private DriveMode mode= DriveMode.Manual;
+    private DriveMode mode= DriveMode.Manual;// trạng thái ban đầu xe chạy bằng điều khiển
     // Start is called before the first frame update
     void Start()
     {
@@ -42,30 +53,37 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (mode == DriveMode.Manual)
-        {
-            Manual();
-        }
-        else
+        SetMode();
+        if (mode == DriveMode.Automatic)
         {
             AutoDrive();
         }
-        SetMode();
+        if(mode == DriveMode.Manual)
+        {
+            Manual();
+        }
+        if(mode == DriveMode.PhysicalManual) { 
+            PhysicalDrive();
+        }
     }
 
     private void SetMode()
     {
         
-        if (check)
+        if (Input.GetKey(KeyCode.A))
         {
             mode = DriveMode.Automatic;
         }
-        else
+        if (Input.GetKey(KeyCode.M))
         {
             mode = DriveMode.Manual;
         }
+        if (Input.GetKey(KeyCode.P))
+        {
+            mode = DriveMode.PhysicalManual;
+        }
 
-        check = Input.GetKey(KeyCode.A);
+
     }
     private void AutoDrive()
     {
@@ -123,5 +141,30 @@ public class PlayerController : MonoBehaviour
 
         // Áp dụng quay vào transform của đối tượng
         transform.Rotate(rotationVector);
+    }
+    private void PhysicalDrive()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        float steerAngle = horizontal * maxSteerAngle;
+        float force = vertical * motorForce;
+
+        frontLeftWheel.steerAngle = steerAngle;
+        frontRightWheel.steerAngle = steerAngle;
+
+        rearLeftWheel.motorTorque = force;
+        rearRightWheel.motorTorque = force;
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rearRightWheel.brakeTorque = breakForce;
+            rearLeftWheel.brakeTorque = breakForce;
+        }
+        else
+        {
+            rearRightWheel.brakeTorque = 0;
+            rearLeftWheel.brakeTorque = 0;
+        }
     }
 }
