@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - point1
+  - point2
+  - point3
+  - struggle
+  - start
   layers:
   - Default
   - TransparentFX

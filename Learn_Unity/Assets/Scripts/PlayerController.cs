@@ -28,7 +28,6 @@ public class PlayerController : MonoBehaviour
 
     public int Speed = 10;
     public float speedRotate = 100f;
-    public bool check;
 
     [SerializeField] private WheelCollider frontLeftWheel;
     [SerializeField] private WheelCollider frontRightWheel;
