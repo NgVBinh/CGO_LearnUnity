@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
         Vector3 moveDirection = targetPosition - transform.position;
         float distance = (moveDirection).magnitude;
 
-        if (distance > 0.1f)
+        if (distance > 0.2f)
         {
             transform.position = Vector3.MoveTowards(transform.position, currentTarget.position, Speed * Time.deltaTime);
         }
